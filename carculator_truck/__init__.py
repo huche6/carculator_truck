@@ -25,6 +25,3 @@ __all__ = (
     "InventoryTruck",
     "get_driving_cycle",
 )
-
-# library version
-__version__ = (0, 4, 0)

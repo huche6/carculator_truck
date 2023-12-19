@@ -1,5 +1,6 @@
 import warnings
 from itertools import product
+from pathlib import Path
 
 import numexpr as ne
 import numpy as np
@@ -9,11 +10,9 @@ from carculator_utils.energy_consumption import EnergyConsumptionModel
 from carculator_utils.model import VehicleModel
 from prettytable import PrettyTable
 
-from . import DATA_DIR
+from carculator_truck import data as data_carculator
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
-
-CARGO_MASSES = DATA_DIR / "payloads.yaml"
 
 
 def finite(array, mask_value=0):
@@ -139,7 +138,9 @@ class TruckModel(VehicleModel):
                             dict(size=s, powertrain=p, year=y, parameter="cargo mass")
                         ] = self.payload[(p, s, y)]
         else:
-            with open(CARGO_MASSES, "r", encoding="utf-8") as stream:
+            with open(
+                Path(data_carculator.__file__).parent / "payloads.yaml", "r", encoding="utf-8"
+            ) as stream:
                 generic_payload = yaml.safe_load(stream)["payload"]
 
             for s in self.array.coords["size"].values:
@@ -159,7 +160,9 @@ class TruckModel(VehicleModel):
                             )
                         ] = self.annual_mileage[(p, s, y)]
         else:
-            with open(CARGO_MASSES, "r", encoding="utf-8") as stream:
+            with open(
+                Path(data_carculator.__file__).parent / "payloads.yaml", "r", encoding="utf-8"
+            ) as stream:
                 annual_mileage = yaml.safe_load(stream)["annual mileage"]
 
             for s in self.array.coords["size"].values:
@@ -717,8 +720,8 @@ class TruckModel(VehicleModel):
 
         # calculate costs per km:
         self["lifetime"] = self["lifetime kilometers"] / self["kilometers per year"]
-        # i = self["interest rate"]
-        # lifetime = self["lifetime"]
+        i = self["interest rate"]
+        lifetime = self["lifetime"]
         amortisation_factor = ne.evaluate("i + (i / ((1 + i) ** lifetime - 1))")
 
         purchase_cost_list = [
@@ -762,9 +765,9 @@ class TruckModel(VehicleModel):
         self["toll cost"] = self["toll cost per km"] / (self["cargo mass"] / 1000)
 
         # simple assumption that component replacement occurs at half of life.
-        # km_per_year = self["kilometers per year"]
-        # com_repl_cost = self["component replacement cost"]
-        # cargo = self["cargo mass"] / 1000
+        km_per_year = self["kilometers per year"]
+        com_repl_cost = self["component replacement cost"]
+        cargo = self["cargo mass"] / 1000
 
         self["amortised component replacement cost"] = ne.evaluate(
             "(com_repl_cost * ((1 - i) ** lifetime / 2) * amortisation_factor) / km_per_year "

@@ -1,0 +1,9 @@
+include *.md
+include *.txt
+include *.yml
+include *.yaml
+include *.rst
+include *.ini
+include *.csv
+recursive-include carculator_truck/data/*
+include LICENSE
