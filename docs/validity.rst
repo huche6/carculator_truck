@@ -63,7 +63,7 @@ Using ``carculator``, these parameters can be obtained the following way:
 
     # Access the acceleration
     ecm.acceleration
-    
+
 Both approaches should return identical results:
 
 .. code-block:: python
@@ -72,20 +72,20 @@ Both approaches should return identical results:
     print(driving_distance == ecm.velocity.sum()*1000)
     print(driving_time == len(ecm.velocity))
     print(np.array_equal(acceleration, ecm.acceleration))
-    
+
     True
     True
     True
     True
-    
+
 And the acceleration returned by carculator should equal the values given by the UNECE:
 
 .. code-block:: python
 
     np.array_equal(np.around(ecm.acceleration,4),np.around(driving_cycle['m/s²'].values,4))
-    
+
     True
-    
+
 Which can be also be verified visually:
 
 .. code-block:: python
@@ -103,7 +103,7 @@ Which can be also be verified visually:
     :width: 400
     :alt: Comparison driving cycle
     :align: center
-    
+
 Car and components masses
 -------------------------
 
@@ -121,11 +121,11 @@ for a 2020 battery electric SUV:
 .. code-block:: python
 
     cm.array.sel(size='SUV', powertrain='BEV', year=2020, parameter=['cargo mass','curb mass', 'driving mass']).values
-    
+
     array([[  20.        ],
        [1719.56033224],
        [1874.56033224]])
-       
+
 One can check whether `total cargo mass` is indeed equal to cargo mass plus the product of the number of passengers
 and the average passenger weight:
 
@@ -135,10 +135,10 @@ and the average passenger weight:
         parameter=['total cargo mass','cargo mass','average passengers', 'average passenger mass']).values
     print('Total cargo of {} kg, with a cargo mass of {} kg, and {} passengers of individual weight of {} kg.'.format(total_cargo[0], cargo[0], passengers[0], passengers_weight[0]))
     print(total_cargo == cargo+(passengers * passengers_weight))
-    
+
     Total cargo of 155.0 kg, with a cargo mass of 20.0 kg, and 1.8 passengers of individual weight of 75.0 kg.
     [True]
-    
+
 However, most of the driving mass is explained by the curb mass:
 
 .. code-block:: python
@@ -151,7 +151,7 @@ However, most of the driving mass is explained by the curb mass:
     :width: 400
     :alt: Pie Total Mass
     :align: center
-    
+
 Here is a split between the components making up for the curb mass.
 One can see that, in the case of a battery electric SUV, most of the weight comes from the glider as well as the battery cells.
 On an equivalent diesel powertrain, the mass of the glider base is comparatively more important:
@@ -209,7 +209,7 @@ On an equivalent diesel powertrain, the mass of the glider base is comparatively
 
     plt.subplots_adjust(wspace=1)
     plt.show()
-  
+
 .. image:: https://github.com/romainsacchi/carculator/blob/master/docs/_static/img/pie_mass_components.png?raw=true
     :width: 900
     :alt: Pie Mass Components
@@ -220,7 +220,7 @@ The `curb mass` returned by ``carculator`` for the year 2010 and 2020 is further
 For example, we use the car database `Car2db <https://car2db.com/>`_ and load all the vehicles produced between 2015 and 2019 (11,500+ vehicles) to do the curb mass calibration for 2020 vehicles.
 The same exercise is done with vehicles between 2008 and 2012 to calibrate the curb mass of given by carculator for vehicles in 2010.
 
-    
+
 .. image:: https://github.com/romainsacchi/carculator/blob/master/docs/_static/img/mass_comparison.png?raw=true
     :width: 900
     :alt: Mass Comparison

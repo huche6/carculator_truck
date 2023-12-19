@@ -110,9 +110,7 @@ class InventoryTruck(Inventory):
         self.A[
             :,
             self.find_input_indices(("other components, for hybrid electric lorry",)),
-            self.find_input_indices(
-                contains=("Truck, ",), excludes=("BEV", "FCEV", "PHEV")
-            ),
+            self.find_input_indices(contains=("Truck, ",), excludes=("BEV", "FCEV", "PHEV")),
         ] = (
             self.array[self.array_inputs["other components mass"], :, index] * -1
         )
@@ -147,12 +145,8 @@ class InventoryTruck(Inventory):
         self.A[
             :,
             self.find_input_indices(contains=("maintenance, lorry 16 metric ton",)),
-            self.find_input_indices(
-                contains=("Truck, ",), excludes=("26t", "32t", "40t", "60t")
-            ),
-        ] = -1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_16t] / 1000 / 16
-        )
+            self.find_input_indices(contains=("Truck, ",), excludes=("26t", "32t", "40t", "60t")),
+        ] = -1 * (self.array[self.array_inputs["gross mass"], :, index_arr_16t] / 1000 / 16)
 
         self.A[
             :,
@@ -160,9 +154,7 @@ class InventoryTruck(Inventory):
             self.find_input_indices(
                 contains=("Truck, ",), excludes=("3.5t", "7.5t", "18t", "40t", "60t")
             ),
-        ] = -1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_28t] / 1000 / 28
-        )
+        ] = -1 * (self.array[self.array_inputs["gross mass"], :, index_arr_28t] / 1000 / 28)
 
         self.A[
             :,
@@ -170,16 +162,12 @@ class InventoryTruck(Inventory):
             self.find_input_indices(
                 contains=("Truck, ",), excludes=("3.5t", "7.5t", "18t", "26t", "32t")
             ),
-        ] = -1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_40t] / 1000 / 40
-        )
+        ] = -1 * (self.array[self.array_inputs["gross mass"], :, index_arr_40t] / 1000 / 40)
 
         # Electric powertrain components
         self.A[
             :,
-            self.find_input_indices(
-                ("market for converter, for electric passenger car",)
-            ),
+            self.find_input_indices(("market for converter, for electric passenger car",)),
             self.find_input_indices(contains=("Truck, ",)),
         ] = (
             self.array[self.array_inputs["converter mass"], :] * -1
@@ -187,9 +175,7 @@ class InventoryTruck(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for electric motor, electric passenger car",)
-            ),
+            self.find_input_indices(("market for electric motor, electric passenger car",)),
             self.find_input_indices(contains=("Truck, ",)),
         ] = (
             self.array[self.array_inputs["electric engine mass"], :] * -1
@@ -197,9 +183,7 @@ class InventoryTruck(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                ("market for inverter, for electric passenger car",)
-            ),
+            self.find_input_indices(("market for inverter, for electric passenger car",)),
             self.find_input_indices(contains=("Truck, ",)),
         ] = (
             self.array[self.array_inputs["inverter mass"], :] * -1
@@ -244,19 +228,11 @@ class InventoryTruck(Inventory):
             self.find_input_indices(contains=("Truck, ", "ICEV")),
         ] = (
             self.array[
-                [
-                    self.array_inputs[x]
-                    for x in ["battery BoP mass", "battery cell mass"]
-                ],
+                [self.array_inputs[x] for x in ["battery BoP mass", "battery cell mass"]],
                 :,
                 index,
             ].sum(dim="parameter")
-            * (
-                1
-                + self.array[
-                    self.array_inputs["battery lifetime replacements"], :, index
-                ]
-            )
+            * (1 + self.array[self.array_inputs["battery lifetime replacements"], :, index])
         ) * -1
 
         # Fuel tank for diesel trucks
@@ -265,9 +241,7 @@ class InventoryTruck(Inventory):
         self.A[
             :,
             self.find_input_indices(("fuel tank, for diesel vehicle",)),
-            self.find_input_indices(
-                contains=("Truck, ", "EV-d"), excludes=("battery",)
-            ),
+            self.find_input_indices(contains=("Truck, ", "EV-d"), excludes=("battery",)),
         ] = (
             self.array[self.array_inputs["fuel tank mass"], :, index] * -1
         )
@@ -278,39 +252,25 @@ class InventoryTruck(Inventory):
 
         self.A[
             :,
-            self.find_input_indices(
-                contains=("treatment of used lorry, 16 metric ton",)
-            ),
-            self.find_input_indices(
-                contains=("Truck, ",), excludes=("26t", "32t", "40t", "60t")
-            ),
-        ] = 1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_16t] / 1000 / 16
-        )
+            self.find_input_indices(contains=("treatment of used lorry, 16 metric ton",)),
+            self.find_input_indices(contains=("Truck, ",), excludes=("26t", "32t", "40t", "60t")),
+        ] = 1 * (self.array[self.array_inputs["gross mass"], :, index_arr_16t] / 1000 / 16)
 
         self.A[
             :,
-            self.find_input_indices(
-                contains=("treatment of used lorry, 28 metric ton",)
-            ),
+            self.find_input_indices(contains=("treatment of used lorry, 28 metric ton",)),
             self.find_input_indices(
                 contains=("Truck, ",), excludes=("3.5t", "7.5t", "18t", "40t", "60t")
             ),
-        ] = 1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_28t] / 1000 / 28
-        )
+        ] = 1 * (self.array[self.array_inputs["gross mass"], :, index_arr_28t] / 1000 / 28)
 
         self.A[
             :,
-            self.find_input_indices(
-                contains=("treatment of used lorry, 40 metric ton",)
-            ),
+            self.find_input_indices(contains=("treatment of used lorry, 40 metric ton",)),
             self.find_input_indices(
                 contains=("Truck, ",), excludes=("3.5t", "7.5t", "18t", "26t", "32t")
             ),
-        ] = 1 * (
-            self.array[self.array_inputs["gross mass"], :, index_arr_40t] / 1000 / 40
-        )
+        ] = 1 * (self.array[self.array_inputs["gross mass"], :, index_arr_40t] / 1000 / 40)
 
         # END of vehicle building
 
@@ -326,9 +286,7 @@ class InventoryTruck(Inventory):
         self.add_fuel_to_vehicles("cng", ["ICEV-g"], "EV-g")
 
         for year in self.scope["year"]:
-            cng_idx = self.get_index_vehicle_from_array(
-                ["ICEV-g"], [year], method="and"
-            )
+            cng_idx = self.get_index_vehicle_from_array(["ICEV-g"], [year], method="and")
 
             self.A[
                 :,
@@ -337,8 +295,7 @@ class InventoryTruck(Inventory):
                     (f"transport, {self.vm.vehicle_type}, ", "ICEV-g", str(year))
                 ),
             ] *= (
-                1
-                + self.array[self.array_inputs["CNG pump-to-tank leakage"], :, cng_idx]
+                1 + self.array[self.array_inputs["CNG pump-to-tank leakage"], :, cng_idx]
             )
 
             # Gas leakage to air
@@ -382,18 +339,13 @@ class InventoryTruck(Inventory):
             np.ix_(
                 np.arange(self.iterations),
                 self.find_input_indices(("EV charger, level 3, plugin, 200 kW",)),
-                self.find_input_indices(
-                    contains=("Truck, "), excludes=("ICEV", "FCEV", " HEV")
-                ),
+                self.find_input_indices(contains=("Truck, "), excludes=("ICEV", "FCEV", " HEV")),
             )
         ] = (
             -1
             / (
                 24
-                * (
-                    2100
-                    / self.array[self.array_inputs["electric energy stored"], :, index]
-                )
+                * (2100 / self.array[self.array_inputs["electric energy stored"], :, index])
                 * self.array[self.array_inputs["kilometers per year"], :, index]
             )
         ).values[

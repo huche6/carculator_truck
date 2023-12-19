@@ -8,19 +8,19 @@ Truck Input Parameter
 
 .. autoclass:: carculator_truck.truck_input_parameters.TruckInputParameters
     :members:
-    
+
 Array
 -----
 
 .. automodule:: carculator_utils.array
     :members:
-    
+
 Driving cycle
 -------------
 
 .. automodule:: carculator_truck.driving_cycles
     :members:
-    
+
 Energy consumption
 ------------------
 

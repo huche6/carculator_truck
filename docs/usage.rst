@@ -6,7 +6,7 @@ Using Carculator Truck
 Static vs. Stochastic mode
 --------------------------
 
-.. note:: 
+.. note::
 
    Many examples are given in this :download:`examples.zip file <_static/resources/examples.zip>` which contains a Jupyter notebook
     you can run directly on your computer.
@@ -22,6 +22,7 @@ Creating truck models in static mode will use the most likely value of the given
 .. code-block:: python
 
    from carculator_truck import *
+
    tip = TruckInputParameters()
    tip.static()
    dcts, array = fill_xarray_from_input_parameters(tip)
@@ -34,6 +35,7 @@ Alternatively, if one wishes to work with probability distributions as parameter
 .. code-block:: python
 
    from carculator_truck import *
+
    tip = TruckInputParameters()
    tip.stochastic(800)
    dcts, array = fill_xarray_from_input_parameters(tip)
@@ -88,7 +90,7 @@ Hence, to select a driving cycle, you can use the following syntax:
 
 .. code-block:: python
 
-   tm = TruckModel(array, cycle='Urban delivery')
+   tm = TruckModel(array, cycle="Urban delivery")
 
 Range
 -----
@@ -169,8 +171,8 @@ and not what is initially defined by the default values. It is easy to change th
     cip = CarInputParameters()
     cip.static()
     dcts, array = fill_xarray_from_input_parameters(cip)
-    array.loc[{'size': '7.5t', 'year': 2020, 'parameter': 'glider base mass'}] = 2000
-    cm = CarModel(array, cycle='WLTC')
+    array.loc[{"size": "7.5t", "year": 2020, "parameter": "glider base mass"}] = 2000
+    cm = CarModel(array, cycle="WLTC")
     cm.set_all()
 
 Alternatively, instead of a Python dictionary, you can pass a file path pointing to an Excel spreadsheet that contains
@@ -192,7 +194,9 @@ It is possible to inter and extrapolate all the parameters to other years simply
 
 .. code-block:: python
 
-    array = array.interp(year=[2018, 2022, 2035, 2040, 2045, 2050],  kwargs={'fill_value': 'extrapolate'})
+    array = array.interp(
+        year=[2018, 2022, 2035, 2040, 2045, 2050], kwargs={"fill_value": "extrapolate"}
+    )
 
 However, we do not recommend extrapolating for years before 2000 or beyond 2050.
 
@@ -205,7 +209,7 @@ for a 7.5t electric truck in 2020 can be obtained from the TruckModel object
 
 .. code-block:: python
 
-    TtW_energy = tm.array.sel(size='7.5t', year=2020, parameter='TtW energy')
+    TtW_energy = tm.array.sel(size="7.5t", year=2020, parameter="TtW energy")
 
 
 .. note::
@@ -224,31 +228,34 @@ List of all the given and calculated parameters of the truck model:
 
 .. code-block:: python
 
-    list_param = tm.array.coords['parameter'].values.tolist()
+    list_param = tm.array.coords["parameter"].values.tolist()
 
 Return the parameters concerned with direct exhaust emissions
 (we remove noise emissions):
 
 .. code-block:: python
 
-    direct_emissions = [x for x in list_param if 'emission' in x and 'noise' not in x]
+    direct_emissions = [x for x in list_param if "emission" in x and "noise" not in x]
 
 Finally, return their values and display the first 10 in a table:
 
 .. code-block:: python
 
-    tm.array.sel(parameter=direct_emissions, year=2030, size='32t', powertrain='ICEV-d').to_dataframe(name='direct emissions')
+    tm.array.sel(
+        parameter=direct_emissions, year=2030, size="32t", powertrain="ICEV-d"
+    ).to_dataframe(name="direct emissions")
 
 Or we could be interested in visualizing the distribution of
 non-characterized noise emissions, in joules:
 
 .. code-block:: python
 
-    noise_emissions = [x for x in list_param if 'noise' in x]
-    data = tm.array.sel(parameter=noise_emissions, year=2030, size='32t', powertrain='ICEV-d', value=0)\
-        .to_dataframe(name='noise emissions')['noise emissions']
-    data[data>0].plot(kind='bar')
-    plt.ylabel('joules per km')
+    noise_emissions = [x for x in list_param if "noise" in x]
+    data = tm.array.sel(
+        parameter=noise_emissions, year=2030, size="32t", powertrain="ICEV-d", value=0
+    ).to_dataframe(name="noise emissions")["noise emissions"]
+    data[data > 0].plot(kind="bar")
+    plt.ylabel("joules per km")
     plt.show()
 
 
@@ -270,12 +277,10 @@ Hence, to plot the carbon footprint for all diesel trucks in 2020:
 
 .. code-block:: python
 
-    results.sel(powertrain="ICEV-d",
-                year=2020,
-                impact_category='climate change',
-                value=0).to_dataframe('impact').unstack(level=1)['impact'].plot(kind='bar',
-                stacked=True)
-    plt.ylabel('kg CO2-eq./tkm')
+    results.sel(
+        powertrain="ICEV-d", year=2020, impact_category="climate change", value=0
+    ).to_dataframe("impact").unstack(level=1)["impact"].plot(kind="bar", stacked=True)
+    plt.ylabel("kg CO2-eq./tkm")
     plt.show()
 
 .. note::
@@ -299,20 +304,24 @@ stochastic mode (with 500 iterations and the driving cycle Long haul).
     tip = TruckInputParameters()
     tip.stochastic(500)
     scope = {
-        'powertrain':['BEV', 'PHEV-d'],
+        "powertrain": ["BEV", "PHEV-d"],
     }
     dcts, array = fill_xarray_from_input_parameters(tip, scope=scope)
-    tm = TruckModel(array, cycle='WLTC')
+    tm = TruckModel(array, cycle="WLTC")
     tm.set_all()
 
     ic = InventoryCalculation(tm)
     results = ic.calculate_impacts()
 
-    data_MC = results.sel(impact_category='climate change').sum(axis=3).to_dataframe('climate change')
-    plt.style.use('seaborn')
-    data_MC.unstack(level=[0,1,2]).boxplot(showfliers=False, figsize=(20,5))
+    data_MC = (
+        results.sel(impact_category="climate change")
+        .sum(axis=3)
+        .to_dataframe("climate change")
+    )
+    plt.style.use("seaborn")
+    data_MC.unstack(level=[0, 1, 2]).boxplot(showfliers=False, figsize=(20, 5))
     plt.xticks(rotation=70)
-    plt.ylabel('kg CO2-eq./tkm')
+    plt.ylabel("kg CO2-eq./tkm")
     plt.show()
 
 
@@ -336,8 +345,12 @@ Inventories can be exported as:
     # export the inventories as a Brightway2 object
     import_object = ic.export_lci_to_bw()
     # export the inventories as an Excel file (returns the file path of the created file)
-    filepath = ic.export_lci_to_excel(software_compatibility="brightway2", ecoinvent_version="3.8")
-    filepath = ic.export_lci_to_excel(software_compatibility="simapro", ecoinvent_version="3.6")
+    filepath = ic.export_lci_to_excel(
+        software_compatibility="brightway2", ecoinvent_version="3.8"
+    )
+    filepath = ic.export_lci_to_excel(
+        software_compatibility="simapro", ecoinvent_version="3.6"
+    )
 
 Import of inventories (static)
 ------------------------------
@@ -347,16 +360,20 @@ The inventories will link to the ecoinvent database.
 .. code-block:: python
 
     import brightway2 as bw
+
     bw.projects.set_current("test_carculator")
     import bw2io
+
     fp = r"C:\file_path_to_the_inventory\lci-test.xlsx"
 
     i = bw2io.ExcelImporter(fp)
     i.apply_strategies()
 
-    i.match_database(fields=('name', 'unit', 'location'))
-    i.match_database("name_of_the_ecoinvent_db", fields=('name', 'unit', 'location', 'reference product'))
-    i.match_database("biosphere3", fields=('name', 'unit', 'categories'))
+    i.match_database(fields=("name", "unit", "location"))
+    i.match_database(
+        "name_of_the_ecoinvent_db", fields=("name", "unit", "location", "reference product")
+    )
+    i.match_database("biosphere3", fields=("name", "unit", "categories"))
 
     i.statistics()
 

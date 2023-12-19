@@ -25,9 +25,7 @@ def test_ttw_energy_against_VECTO():
 
     assert (
         vecto_empty
-        <= tm.array.sel(
-            powertrain="ICEV-d", year=2020, size="40t", parameter="TtW energy", value=0
-        )
+        <= tm.array.sel(powertrain="ICEV-d", year=2020, size="40t", parameter="TtW energy", value=0)
         <= vecto_full
     )
 
@@ -35,12 +33,8 @@ def test_ttw_energy_against_VECTO():
 def test_auxiliary_power_demand():
     # The auxilliary power demand must be lower for combustion trucks
     assert np.all(
-        tm.array.sel(
-            powertrain="ICEV-d", year=2020, parameter="auxiliary power demand", value=0
-        )
-        < tm.array.sel(
-            powertrain="BEV", year=2020, parameter="auxiliary power demand", value=0
-        )
+        tm.array.sel(powertrain="ICEV-d", year=2020, parameter="auxiliary power demand", value=0)
+        < tm.array.sel(powertrain="BEV", year=2020, parameter="auxiliary power demand", value=0)
     )
 
 
@@ -67,9 +61,7 @@ def test_cargo_mass():
                 size="40t",
             )
         ),
-        tm.array.sel(
-            parameter="cargo mass", powertrain="ICEV-d", year=2020, size="40t"
-        ),
+        tm.array.sel(parameter="cargo mass", powertrain="ICEV-d", year=2020, size="40t"),
         rtol=1e-3,
     )
 
@@ -77,9 +69,7 @@ def test_cargo_mass():
 def test_electric_utility_factor():
     # Electric utility factor must be between 0 and 1
     assert 0 <= np.all(tm["electric utility factor"]) <= 1
-    assert (
-        tm.array.sel(parameter="electric utility factor", powertrain="PHEV-d").all() > 0
-    )
+    assert tm.array.sel(parameter="electric utility factor", powertrain="PHEV-d").all() > 0
 
 
 def test_fuel_blends():
@@ -93,36 +83,23 @@ def test_fuel_blends():
 
     # A fuel cannot be specified both as primary and secondary fuel
     for fuel in tm.fuel_blend:
-        assert (
-            tm.fuel_blend[fuel]["primary"]["type"]
-            != tm.fuel_blend[fuel]["secondary"]["type"]
-        )
+        assert tm.fuel_blend[fuel]["primary"]["type"] != tm.fuel_blend[fuel]["secondary"]["type"]
 
 
 def test_battery_mass():
     # Battery mass must equal cell mass and BoP mass
 
     assert np.allclose(
-        tm.array.sel(
-            parameter="energy battery mass", powertrain="BEV", year=2030, size="40t"
-        ),
-        tm.array.sel(
-            parameter="battery cell mass", powertrain="BEV", year=2030, size="40t"
-        )
-        + tm.array.sel(
-            parameter="battery BoP mass", powertrain="BEV", year=2030, size="40t"
-        ),
+        tm.array.sel(parameter="energy battery mass", powertrain="BEV", year=2030, size="40t"),
+        tm.array.sel(parameter="battery cell mass", powertrain="BEV", year=2030, size="40t")
+        + tm.array.sel(parameter="battery BoP mass", powertrain="BEV", year=2030, size="40t"),
     )
 
     # Cell mass must equal capacity divided by energy density of cells
 
     assert np.allclose(
-        tm.array.sel(
-            parameter="battery cell mass", powertrain="BEV", year=2030, size="40t"
-        ),
-        tm.array.sel(
-            parameter="electric energy stored", powertrain="BEV", year=2030, size="40t"
-        )
+        tm.array.sel(parameter="battery cell mass", powertrain="BEV", year=2030, size="40t"),
+        tm.array.sel(parameter="electric energy stored", powertrain="BEV", year=2030, size="40t")
         / tm.array.sel(
             parameter="battery cell energy density",
             powertrain="BEV",

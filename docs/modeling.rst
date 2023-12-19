@@ -1974,4 +1974,3 @@ export the inventories in a format compatible with the LCA framework
 `Brightway2 <https://brightway.dev/>`_ or `SimaPro <https://simapro.com/>`_,
 thereby allowing the characterization of the results against a larger number
 of impact assessment methods.
-

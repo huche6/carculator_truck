@@ -56,9 +56,7 @@ def get_biofuel_share():
     filepath = DATA_DIR / filename
 
     if not filepath.is_file():
-        raise FileNotFoundError(
-            "The CSV file that contains biofuel shares could not be found."
-        )
+        raise FileNotFoundError("The CSV file that contains biofuel shares could not be found.")
     df = pd.read_csv(filepath, sep=";")
 
     country_code = df["Region"].unique()
@@ -94,9 +92,7 @@ def get_electricity_mix():
     filename = "electricity_mixes.csv"
     filepath = DATA_DIR / filename
     if not filepath.is_file():
-        raise FileNotFoundError(
-            "The CSV file that contains electricity mixes could not be found."
-        )
+        raise FileNotFoundError("The CSV file that contains electricity mixes could not be found.")
 
     df = pd.read_csv(filepath, sep=";", index_col=["country", "year"])
     df = df.reset_index()
@@ -107,9 +103,7 @@ def get_electricity_mix():
         .mean()
         .to_xarray()
     )
-    array = array.interpolate_na(
-        dim="year", method="linear", fill_value="extrapolate"
-    ).clip(0, 1)
+    array = array.interpolate_na(dim="year", method="linear", fill_value="extrapolate").clip(0, 1)
     array /= array.sum(axis=2)
 
     return array
@@ -164,9 +158,7 @@ def get_electricity_losses():
     filename = "cumulative_electricity_losses.csv"
     filepath = DATA_DIR / filename
     if not filepath.is_file():
-        raise FileNotFoundError(
-            "The CSV file that contains electricity mixes could not be found."
-        )
+        raise FileNotFoundError("The CSV file that contains electricity mixes could not be found.")
     with open(filepath) as f:
         csv_list = [[val.strip() for val in r.split(";")] for r in f.readlines()]
 
@@ -178,9 +170,7 @@ def get_biomethane_share():
     filepath = DATA_DIR / filename
 
     if not filepath.is_file():
-        raise FileNotFoundError(
-            "The CSV file that contains biomethane shares could not be found."
-        )
+        raise FileNotFoundError("The CSV file that contains biomethane shares could not be found.")
     df = pd.read_csv(filepath, sep=";")
 
     return df.groupby(["country", "year"]).sum().to_xarray().to_array()
@@ -191,9 +181,7 @@ def get_biodiesel_share():
     filepath = DATA_DIR / filename
 
     if not filepath.is_file():
-        raise FileNotFoundError(
-            "The CSV file that contains biodiesel shares could not be found."
-        )
+        raise FileNotFoundError("The CSV file that contains biodiesel shares could not be found.")
     df = pd.read_csv(filepath, sep=";")
 
     return df.groupby(["country", "year"]).sum().to_xarray().to_array()
