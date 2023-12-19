@@ -168,7 +168,7 @@ def test_model_results():
                             .values.astype(float)
                             .item(0)
                         )
-                    except:
+                    except Exception:
                         ref_val = 1
 
                     _ = lambda x: np.where(ref_val == 0, 1, ref_val)

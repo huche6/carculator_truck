@@ -191,7 +191,7 @@ def test_custom_electricity_mix():
     for i, mix in enumerate(mixes):
         if i == 0:
             with pytest.raises(ValueError) as wrapped_error:
-                ic = InventoryTruck(
+                InventoryTruck(
                     tm,
                     method="recipe",
                     indicator="endpoint",

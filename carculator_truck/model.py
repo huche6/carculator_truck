@@ -5,10 +5,7 @@ import numexpr as ne
 import numpy as np
 import xarray as xr
 import yaml
-from carculator_utils.energy_consumption import (
-    EnergyConsumptionModel,
-    get_default_driving_cycle_name,
-)
+from carculator_utils.energy_consumption import EnergyConsumptionModel
 from carculator_utils.model import VehicleModel
 from prettytable import PrettyTable
 
@@ -45,16 +42,20 @@ class TruckModel(VehicleModel):
         This method runs a series of other methods to obtain the tank-to-wheel energy requirement,
         efficiency of the vehicle, costs, etc.
 
-        :meth:`set_component_masses()`, :meth:`set_vehicle_masses()` and :meth:`set_power_parameters()` and
-        :meth:`set_energy_stored_properties` relate to one another.
-        `powertrain_mass` depends on `power`, `curb_mass` is affected by changes in `powertrain_mass`,
-        `combustion engine mass`, `electric engine mass`. `energy battery mass` is influencedby the `curb mass` but also
-        by the `target range` the truck has. `power` is also varying with `curb_mass`.
+        :meth:`set_component_masses()`, :meth:`set_vehicle_masses()`
+        and :meth:`set_power_parameters()` and :meth:`set_energy_stored_properties`
+        relate to one another.
+        `powertrain_mass` depends on `power`, `curb_mass` is affected by changes
+        in `powertrain_mass`,
+        `combustion engine mass`, `electric engine mass`. `energy battery mass` is influenced by
+        the `curb mass` but also by the `target range` the truck has. `power` is also
+        varying with `curb_mass`.
 
         The current solution is to loop through the methods until the change in payload between
         two iterations is inferior to 0.1%. It is then assumed that the trucks are correctly sized.
 
-        :param electric_utility_factor: the share of km driven in battery-depleting mode over the required range autonomy
+        :param electric_utility_factor: the share of km driven in battery-depleting mode over the
+        required range autonomy
         :return: Does not return anything. Modifies ``self.array`` in place.
         """
 
@@ -170,8 +171,8 @@ class TruckModel(VehicleModel):
     def adjust_cost(self):
         """Adjust costs of energy storage over time.
 
-        This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
-        interpolation between years.
+        This method adjusts costs of energy storage over time, to correct for the overly
+        optimistic linear interpolation between years.
         """
 
         n_iterations = self.array.shape[-1]
@@ -233,7 +234,7 @@ class TruckModel(VehicleModel):
 
         # Correction of combustion powertrain cost for ICEV-g
         if "ICEV-g" in self.array.powertrain.values:
-            self.array.loc[:, ["ICEV-g"], "combustion powertrain cost per kW", :, :,] = np.reshape(
+            self.array.loc[:, ["ICEV-g"], "combustion powertrain cost per kW", :, :] = np.reshape(
                 (5.92e160 * np.exp(-0.1819 * self.array.year.values) + 26.76) * cost_factor,
                 (1, 1, n_year, n_iterations),
             )
@@ -440,7 +441,8 @@ class TruckModel(VehicleModel):
 
         Define ``curb mass``, ``driving mass``, and ``cargo mass``.
 
-        * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle and fuel, without people or cargo.
+        * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle
+        and fuel, without people or cargo.
         * ``cargo mass`` is the mass of the cargo and passengers.
         * ``driving mass`` is the ``curb mass`` plus ``cargo mass``.
 
@@ -521,14 +523,15 @@ class TruckModel(VehicleModel):
         over the required range autonomy. Scania's PHEV tractor can drive 60 km in electric mode
         """
         if "PHEV-e" in self.array.coords["powertrain"].values:
-            range = (
+            arr_range = (
                 self.array.loc[dict(parameter="electric energy stored", powertrain="PHEV-e")]
                 * self.array.loc[dict(parameter="battery DoD", powertrain="PHEV-e")]
             ) / (self.array.loc[dict(parameter="TtW energy", powertrain="PHEV-e")] / 1000 / 3.6)
 
             if uf is None:
                 self.array.loc[dict(powertrain="PHEV-e", parameter="electric utility factor")] = (
-                    range / self.array.loc[dict(powertrain="PHEV-c-d", parameter="target range")]
+                    arr_range
+                    / self.array.loc[dict(powertrain="PHEV-c-d", parameter="target range")]
                 )
             else:
                 self.array.loc[dict(powertrain="PHEV-e", parameter="electric utility factor")] = uf
@@ -714,8 +717,8 @@ class TruckModel(VehicleModel):
 
         # calculate costs per km:
         self["lifetime"] = self["lifetime kilometers"] / self["kilometers per year"]
-        i = self["interest rate"]
-        lifetime = self["lifetime"]
+        # i = self["interest rate"]
+        # lifetime = self["lifetime"]
         amortisation_factor = ne.evaluate("i + (i / ((1 + i) ** lifetime - 1))")
 
         purchase_cost_list = [
@@ -759,12 +762,13 @@ class TruckModel(VehicleModel):
         self["toll cost"] = self["toll cost per km"] / (self["cargo mass"] / 1000)
 
         # simple assumption that component replacement occurs at half of life.
-        km_per_year = self["kilometers per year"]
-        com_repl_cost = self["component replacement cost"]
-        cargo = self["cargo mass"] / 1000
+        # km_per_year = self["kilometers per year"]
+        # com_repl_cost = self["component replacement cost"]
+        # cargo = self["cargo mass"] / 1000
 
         self["amortised component replacement cost"] = ne.evaluate(
-            "(com_repl_cost * ((1 - i) ** lifetime / 2) * amortisation_factor) / km_per_year / cargo"
+            "(com_repl_cost * ((1 - i) ** lifetime / 2) * amortisation_factor) / km_per_year "
+            "/ cargo"
         )
 
         self["total cost per km"] = (
@@ -779,7 +783,8 @@ class TruckModel(VehicleModel):
     def calculate_cost_impacts(self, sensitivity=False, scope=None):
         """Cost values per vehicle-km.
 
-        This method returns an array with cost values per vehicle-km, subdivided into the following groups:
+        This method returns an array with cost values per vehicle-km, subdivided into the
+        following groups:
 
         * Purchase
         * Maintenance

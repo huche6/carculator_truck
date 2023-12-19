@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "Carculator truck"
-copyright = "2021, Paul Scherrer Institut"
+project_copyright = "2021, Paul Scherrer Institut"
 author = "Romain Sacchi"
 
 # The full version, including alpha/beta/rc tags
@@ -109,7 +109,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
-# html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
+# html_sidebars = {'**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html']}
 
 references = []
 bibtex_path = os.path.join(".", "references")
