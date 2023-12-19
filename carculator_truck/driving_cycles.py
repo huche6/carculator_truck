@@ -3,8 +3,7 @@ from carculator_utils import get_standard_driving_cycle_and_gradient
 
 
 def get_driving_cycle(size: list, name: str) -> np.ndarray:
-    """
-    Get driving cycle.
+    """Get driving cycle.
 
     :param size: List of vehicle sizes.
     :param name: The name of the driving cycle.
@@ -18,8 +17,7 @@ def get_driving_cycle(size: list, name: str) -> np.ndarray:
 
 
 def get_road_gradient(size: list, name: str) -> np.ndarray:
-    """
-    Get road gradient data.
+    """Get road gradient data.
 
     :param size: List of vehicle sizes.
     :param name: The name of the driving cycle.

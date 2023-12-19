@@ -6,8 +6,8 @@ from . import DATA_DIR
 
 
 def get_sulfur_content_in_fuel():
-    """
-    Retrieve sulfur content per kg of petrol and diesel.
+    """Retrieve sulfur content per kg of petrol and diesel.
+
     For CH, DE, FR, AU and SE, the concentration values come from HBEFA 4.1, from 1909 to 2020 (extrapolated to 2050).
 
     For the other countries, values come from
@@ -46,8 +46,7 @@ def get_sulfur_content_in_fuel():
 
 
 def get_biofuel_share():
-    """
-    Retrieve shares of biofuel consumption from REMIND and shape them into an xarray.
+    """Retrieve shares of biofuel consumption from REMIND and shape them into an xarray.
 
     :return: An axarray with 'country' and 'year' as dimensions
     :rtype: xarray.core.dataarray.DataArray
@@ -77,6 +76,7 @@ def get_biofuel_share():
 
 def get_electricity_mix():
     """Retrieve electricity mixes and shape them into a xarray.
+
     Source:
 
     * for European countries (`EU Reference Scenario 2016
@@ -110,8 +110,8 @@ def get_electricity_mix():
 
 
 def data_to_dict(csv_list):
-    """
-    Returns a dictionary from a sequence of items.
+    """Return a dictionary from a sequence of items.
+
     :param data: list
     :return: dict
     """
@@ -126,8 +126,7 @@ def data_to_dict(csv_list):
 
 
 def get_region_mapping():
-    """
-    Retrieve mapping between ISO country codes and REMIND regions.
+    """Retrieve mapping between ISO country codes and REMIND regions.
 
     :returns: dictionary
     :rtype: dict
@@ -147,8 +146,8 @@ def get_region_mapping():
 
 
 def get_electricity_losses():
-    """
-    Retrieve cumulative electricity losses from high to medium and low voltage.
+    """Retrieve cumulative electricity losses from high to medium and low voltage.
+
     Source: `ecoinvent v.3.6 <https://www.ecoinvent.org/>`_.
 
     :returns: dictionary
@@ -166,6 +165,8 @@ def get_electricity_losses():
 
 
 def get_biomethane_share():
+    """Get biomethane share."""
+
     filename = "share_bio_cng.csv"
     filepath = DATA_DIR / filename
 
@@ -177,6 +178,8 @@ def get_biomethane_share():
 
 
 def get_biodiesel_share():
+    """Get biodiesel share."""
+
     filename = "share_bio_diesel.csv"
     filepath = DATA_DIR / filename
 
@@ -188,8 +191,8 @@ def get_biodiesel_share():
 
 
 class BackgroundSystemModel:
-    """
-    Retrieve and build dictionaries that contain important information to model
+    """Retrieve and build dictionaries that contain important information to model.
+
     in the background system:
 
     * gross electricity production mixes from nearly all countries in the world, from 2015 to 2050.

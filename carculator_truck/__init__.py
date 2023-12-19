@@ -1,4 +1,6 @@
-"""
+"""Carculator_truck init file.
+
+List of all submodules.
 
 Submodules
 ==========

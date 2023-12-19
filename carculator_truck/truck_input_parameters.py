@@ -9,6 +9,11 @@ EXTRA = Path(__file__, "..").resolve() / "data" / "extra_parameters.json"
 
 
 def load_parameters(obj):
+    """Return a json object containing parameters' definitions.
+
+    :param obj: A filepath to a json file, or a json object
+    :return: Returns a json object containing parameters' definitions
+    """
     if isinstance(obj, (str, Path)):
         assert Path(obj).exists(), "Can't find this filepath"
         return json.load(open(obj))
@@ -18,7 +23,7 @@ def load_parameters(obj):
 
 
 class TruckInputParameters(VehicleInputParameters):
-    """ """
+    """Truck input parameters."""
 
     DEFAULT = Path(__file__, "..").resolve() / "data" / "default_parameters.json"
     EXTRA = Path(__file__, "..").resolve() / "data" / "extra_parameters.json"

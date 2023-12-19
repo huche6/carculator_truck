@@ -20,14 +20,15 @@ CARGO_MASSES = DATA_DIR / "payloads.yaml"
 
 
 def finite(array, mask_value=0):
+    """Find where values are finite."""
     return np.where(np.isfinite(array), array, mask_value)
 
 
 class TruckModel(VehicleModel):
+    """Represent the vehicles fleet.
 
-    """
-    This class represents the entirety of the vehicles considered, with useful attributes, such as an array that stores
-    all the vehicles parameters.
+    This class represents the entirety of the vehicles considered, with useful attributes,
+    such as an array that stores all the vehicles parameters.
 
     :ivar array: multidimensional numpy-like array that contains parameters' value(s)
     :vartype array: xarray.DataArray
@@ -39,7 +40,8 @@ class TruckModel(VehicleModel):
     """
 
     def set_all(self, electric_utility_factor: float = None):
-        """
+        """Methods to obtain the tank-to-wheel requirements.
+
         This method runs a series of other methods to obtain the tank-to-wheel energy requirement,
         efficiency of the vehicle, costs, etc.
 
@@ -166,7 +168,8 @@ class TruckModel(VehicleModel):
                 ][s]
 
     def adjust_cost(self):
-        """
+        """Adjust costs of energy storage over time.
+
         This method adjusts costs of energy storage over time, to correct for the overly optimistic linear
         interpolation between years.
         """
@@ -257,9 +260,7 @@ class TruckModel(VehicleModel):
         self.energy_storage = energy_storage
 
     def override_range(self):
-        """
-        Set storage size or range for each powertrain.
-        """
+        """Set storage size or range for each powertrain."""
 
         target_ranges = {
             "Urban delivery": 150,
@@ -296,7 +297,8 @@ class TruckModel(VehicleModel):
         print("")
 
     def calculate_ttw_energy(self):
-        """
+        """Compute the required energy to operate auxiliary services and to move the car.
+
         This method calculates the energy required to operate
         auxiliary services as well as to move the vehicle.
         The sum is stored under the parameter label "TtW energy"
@@ -377,7 +379,8 @@ class TruckModel(VehicleModel):
         ).T
 
     def set_battery_fuel_cell_replacements(self):
-        """
+        """Compute number of replacement batteries needed to match the vehicle lifetime.
+
         These methods calculates the number of replacement batteries needed
         to match the vehicle lifetime. Given the chemistry used,
         the cycle life is known. Given the lifetime kilometers and
@@ -433,7 +436,8 @@ class TruckModel(VehicleModel):
         ) * (self["fuel cell lifetime hours"] > 0)
 
     def set_vehicle_masses(self):
-        """
+        """Compute the curb, driving and total cargo weights.
+
         Define ``curb mass``, ``driving mass``, and ``cargo mass``.
 
         * `curb mass <https://en.wikipedia.org/wiki/Curb_weight>`__ is the mass of the vehicle and fuel, without people or cargo.
@@ -511,7 +515,8 @@ class TruckModel(VehicleModel):
         )
 
     def set_electric_utility_factor(self, uf: float = None) -> None:
-        """
+        """Set the electric utility factor.
+
         The electric utility factor is the share of km driven in battery-depleting mode
         over the required range autonomy. Scania's PHEV tractor can drive 60 km in electric mode
         """
@@ -529,7 +534,8 @@ class TruckModel(VehicleModel):
                 self.array.loc[dict(powertrain="PHEV-e", parameter="electric utility factor")] = uf
 
     def set_energy_stored_properties(self):
-        """
+        """Compute batteries' size.
+
         First, fuel mass is defined. It is dependent on the range required.
         Then batteries are sized, depending on the range required and the energy consumption.
         """
@@ -630,6 +636,10 @@ class TruckModel(VehicleModel):
         self["battery BoP mass"] = self["energy battery mass"] - self["battery cell mass"]
 
     def set_costs(self):
+        """Calculate the different cost types.
+
+        :return:
+        """
         _nz = lambda x: np.where(x < 1, 1, x)
 
         glider_components = [
@@ -767,7 +777,8 @@ class TruckModel(VehicleModel):
         )
 
     def calculate_cost_impacts(self, sensitivity=False, scope=None):
-        """
+        """Cost values per vehicle-km.
+
         This method returns an array with cost values per vehicle-km, subdivided into the following groups:
 
         * Purchase
@@ -844,7 +855,8 @@ class TruckModel(VehicleModel):
             return response / response.sel(value="reference")
 
     def remove_energy_consumption_from_unavailable_vehicles(self):
-        """
+        """Set energy consumption of unused vehicles to zero.
+
         This method sets the energy consumption of vehicles that are not available to zero.
         """
 
