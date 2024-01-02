@@ -3,10 +3,12 @@
 It contains Inventory which provides all methods to solve inventories.
 """
 
+import warnings
+
 import numpy as np
 from carculator_utils.inventory import Inventory
 
-np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 class InventoryTruck(Inventory):
