@@ -2,7 +2,6 @@ import warnings
 from itertools import product
 from pathlib import Path
 
-import numexpr as ne
 import numpy as np
 import xarray as xr
 import yaml
@@ -14,11 +13,6 @@ from prettytable import PrettyTable
 from carculator_truck import data as data_carculator
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
-
-
-def finite(array, mask_value=0):
-    """Find where values are finite."""
-    return np.where(np.isfinite(array), array, mask_value)
 
 
 class TruckModel(VehicleModel):
@@ -740,7 +734,7 @@ class TruckModel(VehicleModel):
         self["lifetime"] = self["lifetime kilometers"] / self["kilometers per year"]
         i = self["interest rate"]
         lifetime = self["lifetime"]
-        amortisation_factor = ne.evaluate("i + (i / ((1 + i) ** lifetime - 1))")
+        amortisation_factor = i + (i / ((1 + i) ** lifetime - 1))
 
         purchase_cost_list = [
             "battery onboard charging infrastructure cost",
@@ -787,9 +781,8 @@ class TruckModel(VehicleModel):
         com_repl_cost = self["component replacement cost"]
         cargo = self["cargo mass"] / 1000
 
-        self["amortised component replacement cost"] = ne.evaluate(
-            "(com_repl_cost * ((1 - i) ** lifetime / 2) * amortisation_factor) / km_per_year "
-            "/ cargo"
+        self["amortised component replacement cost"] = (
+            (com_repl_cost * ((1 - i) ** lifetime / 2) * amortisation_factor) / km_per_year / cargo
         )
 
         self["total cost per km"] = (
