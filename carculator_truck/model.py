@@ -6,6 +6,7 @@ import numexpr as ne
 import numpy as np
 import xarray as xr
 import yaml
+from carculator_utils import replace_values_in_array
 from carculator_utils.energy_consumption import EnergyConsumptionModel
 from carculator_utils.model import VehicleModel
 from prettytable import PrettyTable
@@ -139,7 +140,9 @@ class TruckModel(VehicleModel):
                         ] = self.payload[(p, s, y)]
         else:
             with open(
-                Path(data_carculator.__file__).parent / "payloads.yaml", "r", encoding="utf-8"
+                Path(data_carculator.__file__).parent / "payloads.yaml",
+                "r",
+                encoding="utf-8",
             ) as stream:
                 generic_payload = yaml.safe_load(stream)["payload"]
 
@@ -161,7 +164,9 @@ class TruckModel(VehicleModel):
                         ] = self.annual_mileage[(p, s, y)]
         else:
             with open(
-                Path(data_carculator.__file__).parent / "payloads.yaml", "r", encoding="utf-8"
+                Path(data_carculator.__file__).parent / "payloads.yaml",
+                "r",
+                encoding="utf-8",
             ) as stream:
                 annual_mileage = yaml.safe_load(stream)["annual mileage"]
 
@@ -398,13 +403,11 @@ class TruckModel(VehicleModel):
         """
         # Number of replacement of battery is rounded *up*
 
-        _ = lambda array: np.where(array == 0, 1, array)
-
         self["battery lifetime replacements"] = np.clip(
             (
                 (self["lifetime kilometers"] * self["TtW energy"] / 3600)
-                / _(self["electric energy stored"])
-                / _(self["battery cycle life"])
+                / replace_values_in_array(self["electric energy stored"], lambda x: x == 0)
+                / replace_values_in_array(self["battery cycle life"], lambda x: x == 0)
                 - 1
             ),
             1,
@@ -432,7 +435,10 @@ class TruckModel(VehicleModel):
         self["fuel cell lifetime replacements"] = np.ceil(
             np.clip(
                 self["lifetime kilometers"]
-                / (average_speed.T * _(self["fuel cell lifetime hours"]))
+                / (
+                    average_speed.T
+                    * replace_values_in_array(self["fuel cell lifetime hours"], lambda x: x == 0)
+                )
                 - 1,
                 0,
                 5,
@@ -546,16 +552,13 @@ class TruckModel(VehicleModel):
         Then batteries are sized, depending on the range required and the energy consumption.
         """
 
-        _ = lambda x: np.where(x == 0, 1, x)
-        _nz = lambda x: np.where(x < 1, 1, x)
-
         self.set_average_lhv()
 
         self["fuel mass"] = (
             self["target range"]
             * self["TtW energy"]
             / 1000
-            / _(self["LHV fuel MJ per kg"])
+            / replace_values_in_array(self["LHV fuel MJ per kg"], lambda x: x == 0)
             * (self["LHV fuel MJ per kg"] > 0)
         )
 
@@ -585,7 +588,10 @@ class TruckModel(VehicleModel):
             self.array.loc[dict(powertrain=pt, parameter="fuel tank mass")] = np.clip(
                 17.159
                 * np.log(
-                    _nz(self.array.loc[dict(powertrain=pt, parameter="fuel mass")] * (1 / 0.832))
+                    replace_values_in_array(
+                        self.array.loc[dict(powertrain=pt, parameter="fuel mass")] * (1 / 0.832),
+                        lambda x: x < 1,
+                    )
                 )
                 - 30,
                 0,
@@ -619,7 +625,7 @@ class TruckModel(VehicleModel):
             self["target range"]
             * self["TtW energy"]
             / 1000
-            / _(self["battery DoD"])
+            / replace_values_in_array(self["battery DoD"], lambda x: x == 0)
             / 3.6
             * (self["combustion power share"] == 0)
         )
@@ -633,11 +639,13 @@ class TruckModel(VehicleModel):
                 self.array.loc[dict(powertrain="FCEV", parameter="fuel mass")] * 120 / 3.6 * 0.06
             )
 
-        self["battery cell mass"] = self["electric energy stored"] / _(
-            self["battery cell energy density"]
+        self["battery cell mass"] = self["electric energy stored"] / replace_values_in_array(
+            self["battery cell energy density"], lambda x: x == 0
         )
 
-        self["energy battery mass"] = self["battery cell mass"] / _(self["battery cell mass share"])
+        self["energy battery mass"] = self["battery cell mass"] / replace_values_in_array(
+            self["battery cell mass share"], lambda x: x == 0
+        )
 
         self["battery BoP mass"] = self["energy battery mass"] - self["battery cell mass"]
 
@@ -646,7 +654,6 @@ class TruckModel(VehicleModel):
 
         :return:
         """
-        _nz = lambda x: np.where(x < 1, 1, x)
 
         glider_components = [
             "glider base mass",
@@ -657,7 +664,18 @@ class TruckModel(VehicleModel):
         ]
 
         self["glider cost"] = np.clip(
-            ((38747 * np.log(_nz(self[glider_components].sum(dim="parameter")))) - 252194),
+            (
+                (
+                    38747
+                    * np.log(
+                        replace_values_in_array(
+                            self[glider_components].sum(dim="parameter"),
+                            lambda x: x < 1,
+                        )
+                    )
+                )
+                - 252194
+            ),
             33500,
             110000,
         )
