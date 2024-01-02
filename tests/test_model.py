@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from carculator_utils import replace_values_in_array
 from carculator_utils.array import fill_xarray_from_input_parameters
 
 from carculator_truck import TruckInputParameters, TruckModel
@@ -171,8 +172,7 @@ def test_model_results():
                     except Exception:
                         ref_val = 1
 
-                    _ = lambda x: np.where(ref_val == 0, 1, ref_val)
-                    diff = val / _(ref_val)
+                    diff = val / replace_values_in_array(ref_val, lambda x: x == 0)
                     l_res.append([pwt, size, year, param, val, ref_val, diff])
 
     pd.DataFrame(
